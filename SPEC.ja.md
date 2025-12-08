@@ -78,7 +78,7 @@ ESP32AutoSync/
     ESP32AutoSync.h
     AutoSyncQueue.h
     AutoSyncNotify.h
-    AutoSyncSemaphore.h
+    AutoSyncBinarySemaphore.h
     AutoSyncMutex.h
     detail/AutoSyncCommon.h
 ```
@@ -105,14 +105,27 @@ ISR では強制的にノンブロッキング動作。
 
 tryXXX()はXXX(0)を呼び出す。
 
-### 4.4 提供範囲（初期）
-- Queue<T>
-- Notify
-- BinarySemaphore
-- Mutex
+### 4.4 提供範囲とユースケース
+- Queue<T>  
+  - タスク間で型安全にデータを渡す。ISR→タスクでデータ移譲、タスク→タスクで処理分割。深さはコンストラクタ引数で指定し、リングバッファ代わりにも使える。
+- Notify  
+  - カウンタ用途: `notify()` / `take(timeoutMs)` で ISR→タスクのイベント回数を伝える（軽量な Counting Semaphore として）。  
+  - ビット用途: `setBits(mask)` / `waitBits(mask, timeoutMs, clearOnExit)` で複数イベントを1本の通知で扱う（例: RX_READY / TX_DONE / ERROR のビット待ち）。  
+  - 値書き込み系（上書き/未上書き）は初期リリースでは扱わない。
+- BinarySemaphore  
+  - 単発イベントの受け渡しや、タスク起動の合図に。ISR から `give` してタスク側が `take`。
+- Mutex  
+  - 共有リソースの排他（I2C/SPI/Serial、共有バッファ保護など）。ISR からは使わず、タスク間でのみ利用。
+
+#### 使い分けの目安
+- データを運びたい → Queue<T>（型付きで順序も保証）。  
+- 単なる「来た/いくつ来た」を軽量に伝えたい → Notify（カウンタ）。  
+- 複数種類のイベントをまとめて待ちたい → Notify（ビット）。  
+- 一回だけの合図で十分・カウンタ不要 → BinarySemaphore。  
+- 共有リソースの排他が目的 → Mutex（ISRでは使わない）。
 
 ### 4.5 エラーハンドリング
-- 例外は使わず、戻り値（bool やステータス enum）で結果を返す
+- 例外は使わず、戻り値はシンプルに `bool`（成功/失敗）で返す
 - 失敗時は適切なログレベルで記録し、呼び出し側でリカバーする前提
 
 ### 4.6 時間とスケジューリング
@@ -122,6 +135,7 @@ tryXXX()はXXX(0)を呼び出す。
 ### 4.7 ロギング
 - ESP-IDF の `ESP_LOGE/W/I/D/V` を常に利用可能にする（Arduino 環境でも有効）
 - 目安: E=致命/操作失敗、W=リトライ・タイムアウト等、I=初期化や設定値、D/V=デバッグ用詳細
+- ログの初期化やレベル設定は Arduino ボード定義側で行われる前提とし、ライブラリ側では触らない
 
 ### 4.8 設定方法
 - 初期リリースはグローバル設定なし。各クラスのコンストラクタ/メソッド引数だけで使える構成とする
@@ -156,6 +170,7 @@ notify.wait(bits,...);       // xTaskNotifyWait
 
 ### 5.3 BinarySemaphore / Mutex
 FreeRTOS ネイティブをシンプルにラップ（初期リリースはこの2種）。
+- Mutex には RAII ラッパ（例: `LockGuard`）を用意し、スコープ終了で自動 `give` する使い方を推奨
 
 ---
 
@@ -186,7 +201,7 @@ ISR → AutoTask タスクへ処理移譲。
 - AutoSync は同期だけを担当（シンプル&安定）  
 - API は tryXXX と XXX の2系統に統一  
 - Queue の型だけテンプレートとし、その他はシンプルに保つ
-- 戻り値ベースでエラーを返し、例外は使わない
+- 戻り値は `bool` で返し、例外は使わない
 - 1 tick = 1 ms 前提で設計し、delay() を基本にする
 - マルチコアのコア割り当てやスリープ制御は扱わない（タスク側で指定）
 
