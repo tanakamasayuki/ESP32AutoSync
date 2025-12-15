@@ -1,14 +1,12 @@
 #include <Arduino.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-
 constexpr uint32_t kBitSensor = 1 << 0;
 constexpr uint32_t kBitTimeout = 1 << 1;
 
 // en: Notify bits mode between raw FreeRTOS tasks
 // ja: 生 FreeRTOS タスク間で Notify のビットモードを利用
-Notify evt(Notify::Mode::Bits);
+ESP32AutoSync::Notify evt(ESP32AutoSync::Notify::Mode::Bits);
 
 void producer(void * /*pv*/)
 {

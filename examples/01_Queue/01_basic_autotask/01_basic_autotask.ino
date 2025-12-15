@@ -1,11 +1,9 @@
 #include <ESP32AutoTask.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-
 // en: Queue for int messages between AutoTask hooks on different cores (depth=8)
 // ja: AutoTask フック間で int をやり取りするキュー（深さ8）
-Queue<int> q(8);
+ESP32AutoSync::Queue<int> q(8);
 
 void setup()
 {

@@ -1,9 +1,6 @@
 #include <ESP32TaskKit.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-using namespace TaskKit;
-
 constexpr uint32_t kBitRxReady = 1 << 0;
 constexpr uint32_t kBitTxDone = 1 << 1;
 
@@ -11,9 +8,9 @@ constexpr uint32_t kBitTxDone = 1 << 1;
 // ja: Notify ビットモード（TaskKit タスクで利用）
 // en: preset to bits mode
 // ja: ビットモードで初期化
-Notify evt(Notify::Mode::Bits);
-Task producer;
-Task consumer;
+ESP32AutoSync::Notify evt(ESP32AutoSync::Notify::Mode::Bits);
+TaskKit::Task producer;
+TaskKit::Task consumer;
 
 void setup()
 {
@@ -33,7 +30,7 @@ void setup()
         delay(800);
         return true;
       },
-      TaskConfig{.name = "bits-setter", .priority = 2});
+      TaskKit::TaskConfig{.name = "bits-setter", .priority = 2});
 
   consumer.startLoop(
       [] {
@@ -43,7 +40,7 @@ void setup()
         }
         return true;
       },
-      TaskConfig{.name = "bits-waiter", .priority = 2});
+      TaskKit::TaskConfig{.name = "bits-waiter", .priority = 2});
 }
 
 void loop()

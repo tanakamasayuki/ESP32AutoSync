@@ -1,11 +1,9 @@
 #include <Arduino.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-
 // en: One-shot semaphore between raw FreeRTOS tasks
 // ja: 生 FreeRTOS タスク間のワンショットセマフォ
-BinarySemaphore sem;
+ESP32AutoSync::BinarySemaphore sem;
 
 void signaler(void * /*pv*/)
 {

@@ -1,11 +1,9 @@
 #include <ESP32AutoTask.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-
 // en: Shared Serial output protected by Mutex in AutoTask hooks
 // ja: AutoTask フック間で共有するシリアル出力を Mutex で保護
-Mutex serialMutex;
+ESP32AutoSync::Mutex serialMutex;
 
 void setup()
 {
@@ -15,7 +13,7 @@ void setup()
 
 void printSafe(const char *msg)
 {
-  Mutex::LockGuard lock(serialMutex);
+  ESP32AutoSync::Mutex::LockGuard lock(serialMutex);
   if (lock.locked())
   {
     Serial.println(msg);

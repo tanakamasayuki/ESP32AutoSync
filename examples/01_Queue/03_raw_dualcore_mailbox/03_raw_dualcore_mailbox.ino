@@ -1,11 +1,9 @@
 #include <Arduino.h>
 #include <ESP32AutoSync.h>
 
-using namespace ESP32AutoSync;
-
 // en: Core0 -> Core1 queue (FIFO, depth=8)
 // ja: コア0→コア1 の FIFO キュー（深さ8）
-Queue<int> q(8);
+ESP32AutoSync::Queue<int> q(8);
 
 void sender(void * /*pv*/)
 {
