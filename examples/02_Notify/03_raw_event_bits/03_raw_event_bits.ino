@@ -14,9 +14,15 @@ void producer(void * /*pv*/)
 {
   for (;;)
   {
-    evt.setBits(kBitSensor);
+    if (!evt.setBits(kBitSensor))
+    {
+      Serial.println("[Notify/raw] setBits sensor failed");
+    }
     delay(300);
-    evt.setBits(kBitTimeout);
+    if (!evt.setBits(kBitTimeout))
+    {
+      Serial.println("[Notify/raw] setBits timeout failed");
+    }
     delay(700);
   }
 }

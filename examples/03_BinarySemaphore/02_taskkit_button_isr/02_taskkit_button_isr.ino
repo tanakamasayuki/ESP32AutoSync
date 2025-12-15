@@ -13,7 +13,10 @@ Task handlerTask;
 
 void IRAM_ATTR onButton()
 {
-  buttonSem.give(); // en/ja: ISR-safe give
+  if (!buttonSem.give()) // en/ja: ISR-safe give
+  {
+    // ISR なのでシリアルは避け、最小限の処理のみ
+  }
 }
 
 void setup()

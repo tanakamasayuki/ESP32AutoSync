@@ -19,9 +19,15 @@ void setup()
 
   producer.startLoop(
       [] {
-        evt.setBits(kBitRxReady);
+        if (!evt.setBits(kBitRxReady))
+        {
+          Serial.println("[Notify/bits] setBits RX failed");
+        }
         delay(200);
-        evt.setBits(kBitTxDone);
+        if (!evt.setBits(kBitTxDone))
+        {
+          Serial.println("[Notify/bits] setBits TX failed");
+        }
         delay(800);
         return true;
       },

@@ -20,6 +20,10 @@ void printSafe(const char *msg)
   {
     Serial.println(msg);
   }
+  else
+  {
+    Serial.println("[Mutex/AutoTask] lock failed");
+  }
 }
 
 void LoopCore0_Normal()

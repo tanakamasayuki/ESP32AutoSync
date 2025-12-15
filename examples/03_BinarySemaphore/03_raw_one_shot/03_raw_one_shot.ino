@@ -10,7 +10,10 @@ BinarySemaphore sem;
 void signaler(void * /*pv*/)
 {
   delay(500);
-  sem.give();
+  if (!sem.give())
+  {
+    Serial.println("[BinarySemaphore/raw] give failed");
+  }
   vTaskDelete(nullptr);
 }
 

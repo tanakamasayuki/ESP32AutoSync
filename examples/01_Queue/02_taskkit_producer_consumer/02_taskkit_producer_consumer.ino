@@ -19,6 +19,10 @@ void setup()
       {
         static int value = 0;
         q.send(value++, 1000);
+        if (!q.send(value++, 1000))
+        {
+          Serial.println("[Queue/TaskKit] send failed");
+        }
         delay(500);
         return true;
       },

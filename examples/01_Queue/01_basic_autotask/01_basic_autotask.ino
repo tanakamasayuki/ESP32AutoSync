@@ -20,7 +20,10 @@ void setup()
 void LoopCore0_Normal()
 {
   static int counter = 0;
-  q.send(counter++); // en: blocking send / ja: ブロッキング送信
+  if (!q.send(counter++)) // en/ja: send and check result
+  {
+    Serial.println("[Queue] send failed");
+  }
   delay(500);        // en: throttle send rate / ja: 送信間隔を確保
 }
 

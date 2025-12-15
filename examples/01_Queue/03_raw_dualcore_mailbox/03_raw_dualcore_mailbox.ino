@@ -12,7 +12,10 @@ void sender(void * /*pv*/)
   int counter = 0;
   for (;;)
   {
-    q.send(counter++, 1000);
+    if (!q.send(counter++, 1000))
+    {
+      Serial.println("[Queue/raw] send failed");
+    }
     delay(200);
   }
 }

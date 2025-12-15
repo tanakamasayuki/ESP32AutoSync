@@ -18,6 +18,10 @@ void writer(void * /*pv*/)
       sharedCounter++;
       Serial.printf("[Mutex/raw] writer: %d\n", sharedCounter);
     }
+    else
+    {
+      Serial.println("[Mutex/raw] writer lock failed");
+    }
     delay(300);
   }
 }
@@ -30,6 +34,10 @@ void reader(void * /*pv*/)
     if (lock.locked())
     {
       Serial.printf("[Mutex/raw] reader: %d\n", sharedCounter);
+    }
+    else
+    {
+      Serial.println("[Mutex/raw] reader lock failed");
     }
     delay(500);
   }

@@ -17,7 +17,10 @@ void setup()
 // ja: 送信側がカウンタを増やす
 void LoopCore0_Normal()
 {
-  n.notify(); // en/ja: auto-locks mode to counter
+  if (!n.notify()) // en/ja: auto-locks mode to counter
+  {
+    Serial.println("[Notify/counter] notify failed");
+  }
 }
 
 // en: Consumer takes notifications

@@ -18,7 +18,10 @@ void LoopCore0_Normal()
   static bool sent = false;
   if (!sent)
   {
-    startSignal.give();
+    if (!startSignal.give())
+    {
+      Serial.println("[BinarySemaphore] give failed");
+    }
     sent = true;
   }
 }
