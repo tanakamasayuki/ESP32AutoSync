@@ -20,6 +20,11 @@ Header-only C++ wrappers for FreeRTOS sync primitives on ESP32 (Arduino). Design
 - BinarySemaphore: one-shot event handoff, ISR give supported.
 - Mutex: priority-inheritance mutex (non-recursive), LockGuard included.
 
+## How it fits with task libraries
+- ESP32AutoTask: use weak hooks (`LoopCore0_*`, `LoopCore1_*`) and call ESP32AutoSync inside them.
+- ESP32TaskKit: create tasks with TaskKit and use ESP32AutoSync for sync; clear separation between task mgmt and sync.
+- Raw FreeRTOS: tasks created with `xTaskCreatePinnedToCore` can use ESP32AutoSync directly.
+
 ## Install
 - Arduino IDE Library Manager: search “ESP32AutoSync”.
 - Manual: download the release ZIP and place under `Arduino/libraries`.
@@ -58,6 +63,7 @@ void loop() {
 ## Related libraries
 - ESP32AutoTask: https://github.com/tanakamasayuki/ESP32AutoTask
 - ESP32TaskKit: https://github.com/tanakamasayuki/ESP32TaskKit
+- ESP32AutoSync: https://github.com/tanakamasayuki/ESP32AutoSync
 
 ## License
 - MIT License (see LICENSE).

@@ -20,6 +20,11 @@ ESP32（Arduino）向けの FreeRTOS 同期プリミティブをラップする�
 - BinarySemaphore: 単発イベント用。ISR give 対応。
 - Mutex: 標準ミューテックス（優先度継承・非再帰）。LockGuard 付き。
 
+## タスクライブラリとの組み合わせ
+- ESP32AutoTask: 弱シンボルフック（`LoopCore0_*`, `LoopCore1_*`）の中で ESP32AutoSync を利用。
+- ESP32TaskKit: TaskKit でタスクを作り、同期は ESP32AutoSync に任せる（タスク管理と同期を分離）。
+- 生 FreeRTOS: `xTaskCreatePinnedToCore` などで作ったタスクから直接 ESP32AutoSync を利用。
+
 ## インストール
 - Arduino IDE ライブラリマネージャで「ESP32AutoSync」を検索。
 - 手動: リリース ZIP をダウンロードし、`Arduino/libraries` に配置。
@@ -58,6 +63,7 @@ void loop() {
 ## 関連ライブラリ
 - ESP32AutoTask: https://github.com/tanakamasayuki/ESP32AutoTask
 - ESP32TaskKit: https://github.com/tanakamasayuki/ESP32TaskKit
+- ESP32AutoSync: https://github.com/tanakamasayuki/ESP32AutoSync
 
 ## ライセンス
 - MIT License（LICENSE を参照）。
