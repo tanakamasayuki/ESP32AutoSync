@@ -16,7 +16,7 @@ ESP32AutoSync works seamlessly with:
 - Raw FreeRTOS tasks (`xTaskCreatePinnedToCore`, etc.)
 
 > **Create tasks however you like.  
-> AutoSync is the layer that only handles “sync between tasks.”**
+> ESP32AutoSync is the layer that only handles “sync between tasks.”**
 
 ---
 
@@ -27,28 +27,28 @@ Goals of ESP32AutoSync:
 1. Make FreeRTOS Queue / Notify / Semaphore / Mutex safe and intuitive in C++.
 2. Keep Arduino-like ergonomics while encouraging correct FreeRTOS usage.
 3. Provide APIs safe from both tasks and ISRs.
-4. Offer one API surface regardless of task source (AutoTask / TaskKit / raw FreeRTOS).
+4. Offer one API surface regardless of task source (ESP32AutoTask / ESP32TaskKit / raw FreeRTOS).
 5. Encourage good habits: ISRs “signal only,” tasks do the work.
-6. Bridge from training wheels to raw FreeRTOS: works nicely with AutoTask weak hooks and TaskKit configs/coop-stop, so moving to raw FreeRTOS is easy.
+6. Bridge from training wheels to raw FreeRTOS: works nicely with ESP32AutoTask weak hooks and ESP32TaskKit configs/coop-stop, so moving to raw FreeRTOS is easy.
 
 ---
 
 ## 2. Relationship to Other Libraries
 
 ### 2.1 With ESP32AutoTask
-Weak-hook tasks (`LoopCore0_Low()`, etc.) created by AutoTask can call AutoSync Queue / Notify / Mutex directly.
+Weak-hook tasks (`LoopCore0_Low()`, etc.) created by ESP32AutoTask can call ESP32AutoSync Queue / Notify / Mutex directly.
 
 ### 2.2 With ESP32TaskKit
-Tasks created by TaskKit use AutoSync naturally: TaskKit manages tasks, AutoSync handles sync.
+Tasks created by ESP32TaskKit use ESP32AutoSync naturally: ESP32TaskKit manages tasks, ESP32AutoSync handles sync.
 
 ### 2.3 With Raw FreeRTOS Tasks
-Tasks made via `xTaskCreatePinnedToCore()` can also use AutoSync. Only core FreeRTOS APIs are required; works in Arduino.
+Tasks made via `xTaskCreatePinnedToCore()` can also use ESP32AutoSync. Only core FreeRTOS APIs are required; works in Arduino.
 
 ### 2.4 Roles and Learning Path
-- **AutoTask (training wheels):** `begin()` gives Low/Normal/High slots on core0/1; define weak hooks to run; undefined hooks exit immediately (zero overhead).
-- **TaskKit (intermediate):** `TaskConfig` + `start/startLoop` to set stack/priority/core; `requestStop` for cooperative exit; lambdas/functors for C++ style.
-- **AutoSync (this library):** Any task source; unified API for Queue/Notify/Semaphore/Mutex; examples teach “ISR signals, tasks do work.”
-- Learning flow: start with AutoTask, learn sync with AutoSync, then design tasks flexibly with TaskKit.
+- **ESP32AutoTask (training wheels):** `begin()` gives Low/Normal/High slots on core0/1; define weak hooks to run; undefined hooks exit immediately (zero overhead).
+- **ESP32TaskKit (intermediate):** `TaskConfig` + `start/startLoop` to set stack/priority/core; `requestStop` for cooperative exit; lambdas/functors for C++ style.
+- **ESP32AutoSync (this library):** Any task source; unified API for Queue/Notify/Semaphore/Mutex; examples teach “ISR signals, tasks do work.”
+- Learning flow: start with ESP32AutoTask, learn sync with ESP32AutoSync, then design tasks flexibly with ESP32TaskKit.
 
 ---
 
@@ -242,7 +242,7 @@ ISR → ESP32AutoTask tasks for processing handoff.
 Share queues among multiple ESP32TaskKit tasks.
 
 ### 7.3 Raw FreeRTOS + ESP32AutoSync
-Add AutoSync as the sync layer for existing task sets.
+Add ESP32AutoSync as the sync layer for existing task sets.
 
 ### 7.4 Sample Comment Policy
 - Samples include both English/Japanese.

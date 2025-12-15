@@ -20,7 +20,7 @@ ESP32AutoSync は以下と**組み合わせて使うことができます**：
 - 生の FreeRTOS タスク（`xTaskCreatePinnedToCore` など）
 
 > **タスクの作り方は何でもOK。  
-> AutoSync は「タスク同士のつながり（Sync）」だけを担当するレイヤです。**
+> ESP32AutoSync は「タスク同士のつながり（Sync）」だけを担当するレイヤです。**
 
 ---
 
@@ -33,7 +33,7 @@ ESP32AutoSync の主な目的：
 3. **タスク・ISR 両方から安全に使える API にする**
 4. **ESP32AutoTask / ESP32TaskKit / 生 FreeRTOS タスク など、どんなタスク構成でも同じ API で使えるようにする**
 5. **良い習慣を自然に身につける設計** ISR では「通知・合図だけ」、タスクで「処理本体を行う」という FreeRTOS の基本思想を自然に守りやすい API になっています。
-6. **補助輪→中級→素の FreeRTOS への橋渡し** AutoTask の弱シンボルフックや TaskKit の Config/協調停止の設計と噛み合わせ、最終的に素の FreeRTOS API へ移行しやすい作りを目指します。
+6. **補助輪→中級→素の FreeRTOS への橋渡し** ESP32AutoTask の弱シンボルフックや ESP32TaskKit の Config/協調停止の設計と噛み合わせ、最終的に素の FreeRTOS API へ移行しやすい作りを目指します。
 
 ---
 
@@ -41,24 +41,24 @@ ESP32AutoSync の主な目的：
 
 ### 2.1 ESP32AutoTask との組み合わせ
 
-AutoTask で作られる弱宣言タスク（`LoopCore0_Low()` など）から  
-AutoSync の Queue / Notify / Mutex をそのまま利用できます。
+ESP32AutoTask で作られる弱宣言タスク（`LoopCore0_Low()` など）から  
+ESP32AutoSync の Queue / Notify / Mutex をそのまま利用できます。
 
 ### 2.2 ESP32TaskKit との組み合わせ
 
-TaskKit で作ったタスクからも AutoSync を自然に利用できます。  
-タスク管理は TaskKit、同期は AutoSync という明確な役割分担になります。
+ESP32TaskKit で作ったタスクからも ESP32AutoSync を自然に利用できます。  
+タスク管理は ESP32TaskKit、同期は ESP32AutoSync という明確な役割分担になります。
 
 ### 2.3 生の FreeRTOS タスクとの併用
 
-`xTaskCreatePinnedToCore()` などで生成したタスクからも AutoSync を利用可能。  
+`xTaskCreatePinnedToCore()` などで生成したタスクからも ESP32AutoSync を利用可能。  
 FreeRTOS の基本APIのみへ依存しており、Arduinoで動作します。
 
 ### 2.4 ライブラリ間の役割分担と学習ステップ
-- **AutoTask（補助輪）**: `begin()` を呼ぶだけでコア0/1の Low/Normal/High タスク枠が用意され、弱シンボルのフックを定義すれば動く。未定義フックは即終了しオーバーヘッドゼロ。
-- **TaskKit（中級者向け）**: `TaskConfig` と `Task.start/startLoop` でスタック/優先度/コアを明示し、`requestStop` で協調終了する。ラムダや functor で C++ らしく書ける。
-- **AutoSync（本ライブラリ）**: タスクは上記どれで作ってもよく、Queue/Notify/Semaphore/Mutex の正しい使い方を統一 API で提供する。ISR では「合図だけ」、タスクで処理本体という良い習慣を examples で身につけられる。
-- 学習導線: AutoTask で動かしてから AutoSync で同期を学び、さらに TaskKit でタスク設計を柔軟にする、という段階的習得を想定。
+- **ESP32AutoTask（補助輪）**: `begin()` を呼ぶだけでコア0/1の Low/Normal/High タスク枠が用意され、弱シンボルのフックを定義すれば動く。未定義フックは即終了しオーバーヘッドゼロ。
+- **ESP32TaskKit（中級者向け）**: `TaskConfig` と `Task.start/startLoop` でスタック/優先度/コアを明示し、`requestStop` で協調終了する。ラムダや functor で C++ らしく書ける。
+- **ESP32AutoSync（本ライブラリ）**: タスクは上記どれで作ってもよく、Queue/Notify/Semaphore/Mutex の正しい使い方を統一 API で提供する。ISR では「合図だけ」、タスクで処理本体という良い習慣を examples で身につけられる。
+- 学習導線: ESP32AutoTask で動かしてから ESP32AutoSync で同期を学び、さらに ESP32TaskKit でタスク設計を柔軟にする、という段階的習得を想定。
 
 ---
 
