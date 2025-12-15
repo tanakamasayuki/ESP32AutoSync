@@ -22,7 +22,7 @@ void receiver(void * /*pv*/)
   int v = 0;
   for (;;)
   {
-    if (q.receive(v, WaitForever))
+    if (q.receive(v))
     {
       Serial.printf("[Queue/raw] core=%d recv=%d\n", xPortGetCoreID(), v);
     }

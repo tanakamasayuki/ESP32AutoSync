@@ -29,7 +29,7 @@ void setup()
 
   consumer.startLoop(
       [] {
-        if (evt.waitBits(kBitRxReady | kBitTxDone, WaitForever, true, true))
+        if (evt.waitBits(kBitRxReady | kBitTxDone, true, true))
         {
           Serial.println("[Notify/bits] RX ready & TX done");
         }

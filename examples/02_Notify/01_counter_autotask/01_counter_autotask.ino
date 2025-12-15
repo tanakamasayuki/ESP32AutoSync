@@ -24,7 +24,7 @@ void LoopCore0_Normal()
 // ja: 受信側が通知を1件消費
 void LoopCore1_Normal()
 {
-  if (n.take(WaitForever))
+  if (n.take())
   {
     Serial.println("[Notify/counter] got event");
   }

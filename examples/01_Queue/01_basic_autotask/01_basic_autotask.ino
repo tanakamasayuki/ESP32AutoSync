@@ -29,7 +29,7 @@ void LoopCore0_Normal()
 void LoopCore1_Normal()
 {
   int value = 0;
-  if (q.receive(value, WaitForever))
+  if (q.receive(value))
   {
     Serial.printf("[Queue] received: %d\n", value);
   }

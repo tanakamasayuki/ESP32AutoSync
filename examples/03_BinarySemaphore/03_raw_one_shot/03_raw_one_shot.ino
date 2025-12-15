@@ -16,7 +16,7 @@ void signaler(void * /*pv*/)
 
 void waiter(void * /*pv*/)
 {
-  if (sem.take(WaitForever))
+  if (sem.take())
   {
     Serial.println("[BinarySemaphore/raw] got signal");
   }

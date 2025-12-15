@@ -25,7 +25,7 @@ void consumer(void * /*pv*/)
 {
   for (;;)
   {
-    if (evt.waitBits(kBitSensor | kBitTimeout, WaitForever, true, false))
+    if (evt.waitBits(kBitSensor | kBitTimeout))
     {
       Serial.printf("[Notify/raw] bits=0x%02lx\n", (unsigned long)(kBitSensor | kBitTimeout));
     }

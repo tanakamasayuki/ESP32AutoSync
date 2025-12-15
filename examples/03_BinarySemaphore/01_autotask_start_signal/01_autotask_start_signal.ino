@@ -27,7 +27,7 @@ void LoopCore0_Normal()
 // ja: 受信側が開始合図を待つ
 void LoopCore1_Normal()
 {
-  if (startSignal.take(WaitForever))
+  if (startSignal.take())
   {
     Serial.println("[BinarySemaphore] start!");
     // en: run once, then idle

@@ -390,6 +390,12 @@ namespace ESP32AutoSync
       return waitBits(mask, 0, clearOnExit, waitAll);
     }
 
+    // Convenience overload to use defaults for timeout while specifying flags
+    bool waitBits(uint32_t mask, bool clearOnExit, bool waitAll)
+    {
+      return waitBits(mask, WaitForever, clearOnExit, waitAll);
+    }
+
   private:
     bool lockMode(Mode desired)
     {

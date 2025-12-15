@@ -28,7 +28,7 @@ void setup()
       []
       {
         int v = 0;
-        if (q.receive(v, WaitForever))
+        if (q.receive(v))
         {
           Serial.printf("[Queue/TaskKit] received: %d\n", v);
         }

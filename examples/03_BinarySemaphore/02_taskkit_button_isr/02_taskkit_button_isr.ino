@@ -24,7 +24,7 @@ void setup()
 
   handlerTask.startLoop(
       [] {
-        if (buttonSem.take(WaitForever))
+        if (buttonSem.take())
         {
           Serial.println("[BinarySemaphore] button pressed");
         }
