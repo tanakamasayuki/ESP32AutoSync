@@ -218,6 +218,7 @@ Mutex::LockGuard guard(mutex);          // RAII unlock on scope exit
 - Created via `xSemaphoreCreateMutex` (non-recursive, priority inheritance). On failure, handle is null. Copy disallowed; move allowed. Lazy creation on first use is acceptable.
 - LockGuard behavior: ctor calls `lock(timeoutMs)`, sets a “held” flag only on success. On failure, flag stays false (log a warning); dtor unlocks only when held to avoid double-unlock. Provide `locked()` (or similar) so callers can check acquisition. Default `timeoutMs` is `WaitForever` (block until acquired); if you need bounded wait, pass a shorter timeout and handle the failure explicitly.
 - Thread safety: safe across multiple tasks for lock/unlock. ISR calls are not allowed.
+- LockGuard usage: typical pattern is `Mutex::LockGuard g(m); if (!g.locked()) { /* handle failure */ }`. Multiple tasks may lock the same `Mutex` instance sequentially (others wait). Only the standard mutex type is supported; no mix of recursive or other mutex types.
 
 ---
 
