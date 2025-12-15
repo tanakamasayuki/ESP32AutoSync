@@ -22,7 +22,7 @@ ESP32（Arduino）向けの FreeRTOS 同期プリミティブをラップする�
 
 ## タスクライブラリとの組み合わせ
 - ESP32AutoTask: 弱シンボルフック（`LoopCore0_*`, `LoopCore1_*`）の中で ESP32AutoSync を利用。
-- ESP32TaskKit: TaskKit でタスクを作り、同期は ESP32AutoSync に任せる（タスク管理と同期を分離）。
+- ESP32TaskKit: ESP32TaskKit でタスクを作り、同期は ESP32AutoSync に任せる（タスク管理と同期を分離）。
 - 生 FreeRTOS: `xTaskCreatePinnedToCore` などで作ったタスクから直接 ESP32AutoSync を利用。
 
 ## インストール

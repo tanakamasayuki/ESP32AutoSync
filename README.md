@@ -22,7 +22,7 @@ Header-only C++ wrappers for FreeRTOS sync primitives on ESP32 (Arduino). Design
 
 ## How it fits with task libraries
 - ESP32AutoTask: use weak hooks (`LoopCore0_*`, `LoopCore1_*`) and call ESP32AutoSync inside them.
-- ESP32TaskKit: create tasks with TaskKit and use ESP32AutoSync for sync; clear separation between task mgmt and sync.
+- ESP32TaskKit: create tasks with ESP32TaskKit and use ESP32AutoSync for sync; clear separation between task mgmt and sync.
 - Raw FreeRTOS: tasks created with `xTaskCreatePinnedToCore` can use ESP32AutoSync directly.
 
 ## Install
