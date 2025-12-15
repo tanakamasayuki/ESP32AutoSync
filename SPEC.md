@@ -124,6 +124,7 @@ Internally uses `xPortInIsrContext()` and picks FromISR APIs automatically.
 - Always use ESP-IDF `ESP_LOGE/W/I/D/V` (available in Arduino).
 - E=critical/failure, W=retry/timeout, I=init/settings, D/V=debug details.
 - Logging level init is handled by board definitions; library does not touch it.
+- Use a common log tag `ESP32AutoSync`. If class disambiguation is needed, prefix the message with `[Queue]`, `[Notify]`, `[BinarySemaphore]`, `[Mutex]`, etc.
 
 ### 4.8 Configuration
 - No global settings initially. All via ctor/method args.
