@@ -189,6 +189,7 @@ notify.tryWaitBits(mask,
 - Binding policy: start unbound. The first task that calls `take`/`waitBits` auto-binds as the receiver and remains fixed. If you want explicit binding, support ctor or `bindTo(handle)` / `bindToSelf()`, with no rebind allowed. Calling `notify`/`setBits` while unbound or calling `take`/`waitBits` from a non-receiver task returns false and logs a warning.
 - Mode policy: each instance is either “counter” or “bits”. Either specify via ctor or auto-lock on the first API used (`take` family vs `waitBits` family). Calls from the other mode are rejected (false + log). Re-locking is not allowed.
 - Thread/ISR safety: sending (`notify`/`setBits`) is allowed from any task or ISR. Receiving (`take`/`waitBits`) is only for the bound task. ISR receive is forced non-blocking and generally discouraged; prefer receiving in tasks.
+- ISR receive: Due to FreeRTOS limits, `take`/`waitBits` are not actually supported in ISR and will return false immediately; plan to receive in tasks.
 
 ### 5.3 BinarySemaphore
 Thin wrapper of FreeRTOS binary semaphore. Use for one-shot events or start signals.
