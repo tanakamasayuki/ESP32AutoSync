@@ -1,0 +1,7 @@
+ESP32AutoSync	KEYWORD1
+Queue	KEYWORD1
+Notify	KEYWORD1
+BinarySemaphore	KEYWORD1
+Mutex	KEYWORD1
+LockGuard	KEYWORD2
+WaitForever	LITERAL1
