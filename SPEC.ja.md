@@ -149,30 +149,74 @@ tryXXX()はXXX(0)を呼び出す。
 
 ---
 
-## 5. クラス仕様（要約）
+## 5. クラス仕様
 
 ### 5.1 Queue<T>
-テンプレートキュー（型安全・ISR対応）。
+テンプレートキュー（型安全・ISR自動判定）。
 
 ```cpp
-Queue<T>::trySend(value);
-Queue<T>::send(value, timeoutMs);
-Queue<T>::tryReceive(out);
-Queue<T>::receive(out, timeoutMs);
+Queue<T> q(depth);                   // 深さをコンストラクタで指定
+q.trySend(value);                    // == send(value, 0)
+q.send(value, timeoutMs = WaitForever);
+q.tryReceive(out);                   // == receive(out, 0)
+q.receive(out, timeoutMs = WaitForever);
 ```
+
+- タスク上では `timeoutMs` に `WaitForever` で無限待ち、ISR では強制ノンブロック。  
+- `send/receive` はタスク/ISR を自動判定し、`xQueueSend` / `xQueueSendFromISR` / `xQueueReceive` / `xQueueReceiveFromISR` を適切に選択。必要に応じて `portYIELD_FROM_ISR` も内部処理。  
+- `T` はコピー/ムーブ可能な型を想定。サイズが大きい場合はポインタや小さな構造体を推奨。  
+- 戻り値は `bool`（成功/タイムアウト/キュー満杯で false）。エラー時はログを出して呼び出し側でリカバーする前提。
 
 ### 5.2 Notify
-タスク通知（カウンタ/ビット）。
+タスク通知（カウンタ/ビット）。`notify()` で積み、`take()` で 1 件消費、`setBits()` / `waitBits()` でビット待ちができる。
 
 ```cpp
-notify.notify();             // ISR/Task 自動判定
-notify.take(timeoutMs);      // ulTaskNotifyTake
-notify.wait(bits,...);       // xTaskNotifyWait
+// カウンタ用途（軽量カウンティングセマフォ）
+notify.notify();                         // give。ISR/Task 自動判定
+notify.take(timeoutMs = WaitForever);    // 1 件消費（bool で成否）
+notify.tryTake();                        // == take(0)
+
+// ビット用途（EventGroup 風）
+notify.setBits(mask);                    // OR で積み上げ。ISR 可
+notify.waitBits(mask,
+                timeoutMs = WaitForever,
+                clearOnExit = true,
+                waitAll = false);        // any-of がデフォルト
+notify.tryWaitBits(mask,
+                   clearOnExit = true,
+                   waitAll = false);     // == waitBits(mask, 0, clearOnExit, waitAll)
 ```
 
-### 5.3 BinarySemaphore / Mutex
-FreeRTOS ネイティブをシンプルにラップ（初期リリースはこの2種）。
-- Mutex には RAII ラッパ（例: `LockGuard`）を用意し、スコープ終了で自動 `give` する使い方を推奨
+- カウンタは `ulTaskNotifyTake` 相当で、`notify()` の回数を蓄積し `take()` で 1 件ずつ消費。残りは後続 `take()` で順次処理する。  
+- ビットは `xTaskNotifyWait` ベース。`waitAll=false` なら指定マスクのいずれかが立ったら復帰、`true` なら全ビットが揃うまで待つ。`clearOnExit=true` で満たしたビットをクリア。  
+- ISR からの `notify()` / `setBits()` は自動で FromISR 版を選択し、必要に応じて `portYIELD_FROM_ISR` を内部で実行する。  
+- `timeoutMs` に `WaitForever` を指定するとタスク上では無限待ち、ISR では強制ノンブロック（0ms）になる。戻り値は全て `bool`（成功/タイムアウト）。
+
+### 5.3 BinarySemaphore
+FreeRTOS バイナリセマフォの薄いラッパ。単発イベントや起動合図向け。
+
+```cpp
+binary.give();                          // ISR/Task 自動判定
+binary.take(timeoutMs = WaitForever);   // bool で成否
+binary.tryTake();                       // == take(0)
+```
+
+- `give` は FromISR を自動選択し、必要なら `portYIELD_FROM_ISR` を内部で実行。  
+- `take` は `WaitForever` で無限待ち、ISR 上では強制 0ms（ノンブロック）。戻り値は成功/タイムアウトの bool。  
+
+### 5.4 Mutex
+FreeRTOS 標準ミューテックスのラッパ。共有リソースの排他用（タスク専用）。
+
+```cpp
+mutex.lock(timeoutMs = WaitForever);    // bool で成否
+mutex.tryLock();                        // == lock(0)
+mutex.unlock();                         // 所有者のみ
+Mutex::LockGuard guard(mutex);          // RAII でスコープ解放時 unlock
+```
+
+- 優先度逆転防止付きの標準ミューテックスを利用。ISR からは使用不可。  
+- `lock` は `WaitForever` で無限待ち、タイムアウト時は false。  
+- `LockGuard` で取得漏れ/解放漏れを防ぎ、例外非使用環境でもスコープで確実に `unlock`。  
 
 ---
 
@@ -195,12 +239,12 @@ ISR → ESP32AutoTask タスクへ処理移譲。
 ### 7.3 生 FreeRTOS + ESP32AutoSync
 既存タスク群の同期レイヤとして追加可能。
 
-### サンプルコードのコメント方針
+### 7.4 サンプルコードのコメント方針
 - サンプルは英語/日本語を併記する
 - 行頭に書く場合は言語ごとに分ける（例: `// en: ...` の次行に `// ja: ...`）
 - 行末に書く場合は 1 行で区切る（例: `// en: ... / ja: ...`）
 
-### サンプルの作り分け方針
+### 7.5 サンプルの作り分け方針
 - ESP32AutoTask: タスク枠が限られるため、1タスク内で複数ノンブロッキング関数を回す「共有タスク構造」を基本にする
 - ESP32TaskKit: タスクを気軽に増やせるので、ブロッキング処理を専用タスクに分離する方式を基本にする
 - 各機能（Queue/Notify/BinarySemaphore/Mutex）でノンブロックとブロックの双方のサンプルを用意する
