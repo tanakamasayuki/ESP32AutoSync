@@ -172,6 +172,7 @@ q.receive(out, timeoutMs = WaitForever);
 - `send/receive` はタスク/ISR を自動判定し、`xQueueSend` / `xQueueSendFromISR` / `xQueueReceive` / `xQueueReceiveFromISR` を適切に選択。必要に応じて `portYIELD_FROM_ISR` も内部処理。  
 - `T` はコピー/ムーブ可能な型を想定。サイズが大きい場合はポインタや小さな構造体を推奨。  
 - 戻り値は `bool`（成功/タイムアウト/キュー満杯で false）。エラー時はログを出して呼び出し側でリカバーする前提。
+- スレッド/ISR セーフ: 複数タスクからの send/receive を許容。ISR からの receive も FromISR 版で動作するが、処理本体はタスク側に寄せる運用を推奨（受信は基本タスク側）。
 
 ### 5.2 Notify
 タスク通知（カウンタ/ビット）。`notify()` で積み、`take()` で 1 件消費、`setBits()` / `waitBits()` でビット待ちができる。
@@ -199,6 +200,7 @@ notify.tryWaitBits(mask,
 - `timeoutMs` に `WaitForever` を指定するとタスク上では無限待ち、ISR では強制ノンブロック（0ms）になる。戻り値は全て `bool`（成功/タイムアウト）。
 - バインド方針: 初期状態は未バインド。最初に `take`/`waitBits` を呼んだタスクを受信者として自動バインドし、その後は固定。明示的に宛先を指定したい場合はコンストラクタや `bindTo(handle)` / `bindToSelf()` を用意し、一度バインドしたら再バインド不可。未バインドのまま `notify`/`setBits` が呼ばれた場合や、受信者と異なるタスクが `take`/`waitBits` を呼んだ場合は false を返しログで警告する。
 - モード方針: インスタンスごとに「カウンタ用」か「ビット用」を固定。コンストラクタで明示指定、または初回に呼ばれた API（`take` 系 or `waitBits` 系）で自動ロックし、異なるモードの呼び出しは false＋ログで拒否する。モード再設定は不可。
+- スレッド/ISR セーフ: 送信側（`notify`/`setBits`）はタスク/ISR どこからでも可。受信側（`take`/`waitBits`）はバインドしたタスクのみ。ISR からの受信は強制ノンブロックになるため、基本はタスク側で受信する運用を推奨。
 
 ### 5.3 BinarySemaphore
 FreeRTOS バイナリセマフォの薄いラッパ。単発イベントや起動合図向け。
@@ -212,6 +214,7 @@ binary.tryTake();                       // == take(0)
 - `give` は FromISR を自動選択し、必要なら `portYIELD_FROM_ISR` を内部で実行。  
 - `take` は `WaitForever` で無限待ち、ISR 上では強制 0ms（ノンブロック）。戻り値は成功/タイムアウトの bool。  
 - 生成は `xSemaphoreCreateBinary`（初期値0）で行い、失敗時は null。コピー不可・ムーブ可。必要なら初回利用時に遅延生成してもよい。
+- スレッド/ISR セーフ: `give` は ISR/タスク双方から可。`take` はタスクでの利用が基本（ISR ではノンブロック運用のみ）。
 
 ### 5.4 Mutex
 FreeRTOS 標準ミューテックスのラッパ。共有リソースの排他用（タスク専用）。
@@ -228,6 +231,7 @@ Mutex::LockGuard guard(mutex);          // RAII でスコープ解放時 unlock
 - `LockGuard` で取得漏れ/解放漏れを防ぎ、例外非使用環境でもスコープで確実に `unlock`。  
 - 生成は `xSemaphoreCreateMutex`（非再帰、優先度継承あり）で行い、失敗時は null。コピー不可・ムーブ可。初回利用時に遅延生成してもよい。
 - LockGuard の挙動: コンストラクタで `lock(timeoutMs)` を呼び、成功時のみ「保持中」フラグを立てる。失敗時はフラグ false のまま（ログで警告）、デストラクタは保持中の場合のみ `unlock` するためダブルアンロックを防げる。`locked()` などで取得成否を呼び出し側が確認できるようにし、デフォルト `timeoutMs` は `WaitForever`（取り切る前提）。必要に応じて短いタイムアウトを明示指定し、失敗時の処理をコード側で行う。
+- スレッドセーフ: 複数タスク間での lock/unlock を安全に扱える。ISR からの呼び出しは不可。
 
 ---
 

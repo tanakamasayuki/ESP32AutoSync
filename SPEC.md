@@ -158,6 +158,7 @@ q.receive(out, timeoutMs = WaitForever);
 - `send/receive` auto-select `xQueueSend` / `xQueueSendFromISR` / `xQueueReceive` / `xQueueReceiveFromISR`, with `portYIELD_FROM_ISR` handled inside when needed.  
 - `T` should be copy/move-capable. For large payloads, pass pointers or small structs.  
 - Returns `bool` (false on timeout/full). Failures log; caller recovers.
+- Thread/ISR safety: multiple tasks may send/receive on the same instance. ISR receive works via FromISR, but keep actual processing in tasks; receiving in ISR is possible but not the primary pattern.
 
 ### 5.2 Notify
 Task notification (counter/bits). Use `notify()` to accumulate, `take()` to consume one, `setBits()` / `waitBits()` for bit waits.
@@ -185,6 +186,7 @@ notify.tryWaitBits(mask,
 - `timeoutMs = WaitForever` blocks forever in tasks, forced to 0 ms (non-blocking) in ISR. All return `bool` (success/timeout).
 - Binding policy: start unbound. The first task that calls `take`/`waitBits` auto-binds as the receiver and remains fixed. If you want explicit binding, support ctor or `bindTo(handle)` / `bindToSelf()`, with no rebind allowed. Calling `notify`/`setBits` while unbound or calling `take`/`waitBits` from a non-receiver task returns false and logs a warning.
 - Mode policy: each instance is either “counter” or “bits”. Either specify via ctor or auto-lock on the first API used (`take` family vs `waitBits` family). Calls from the other mode are rejected (false + log). Re-locking is not allowed.
+- Thread/ISR safety: sending (`notify`/`setBits`) is allowed from any task or ISR. Receiving (`take`/`waitBits`) is only for the bound task. ISR receive is forced non-blocking and generally discouraged; prefer receiving in tasks.
 
 ### 5.3 BinarySemaphore
 Thin wrapper of FreeRTOS binary semaphore. Use for one-shot events or start signals.
@@ -198,6 +200,7 @@ binary.tryTake();                       // == take(0)
 - `give` auto-selects FromISR and runs `portYIELD_FROM_ISR` when needed.  
 - `take` blocks with `WaitForever` in tasks; forced 0 ms in ISR. Returns success/timeout.
 - Created via `xSemaphoreCreateBinary` (initial count 0). If creation fails, handle is null. Copy disallowed; move allowed. Lazy creation on first use is acceptable if needed.
+- Thread/ISR safety: `give` is allowed from task or ISR. `take` is primarily for tasks (ISR use is non-blocking only).
 
 ### 5.4 Mutex
 Wrapper of FreeRTOS standard mutex. Mutual exclusion for shared resources (task-only).
@@ -214,6 +217,7 @@ Mutex::LockGuard guard(mutex);          // RAII unlock on scope exit
 - `LockGuard` prevents leak/forget to unlock, even without exceptions.
 - Created via `xSemaphoreCreateMutex` (non-recursive, priority inheritance). On failure, handle is null. Copy disallowed; move allowed. Lazy creation on first use is acceptable.
 - LockGuard behavior: ctor calls `lock(timeoutMs)`, sets a “held” flag only on success. On failure, flag stays false (log a warning); dtor unlocks only when held to avoid double-unlock. Provide `locked()` (or similar) so callers can check acquisition. Default `timeoutMs` is `WaitForever` (block until acquired); if you need bounded wait, pass a shorter timeout and handle the failure explicitly.
+- Thread safety: safe across multiple tasks for lock/unlock. ISR calls are not allowed.
 
 ---
 
