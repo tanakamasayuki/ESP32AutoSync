@@ -1,0 +1,41 @@
+#include <ESP32AutoTask.h>
+#include <ESP32AutoSync.h>
+
+using namespace ESP32AutoSync;
+
+// en: Queue for int messages between AutoTask hooks on different cores (depth=8)
+// ja: AutoTask フック間で int をやり取りするキュー（深さ8）
+Queue<int> q(8);
+
+void setup()
+{
+  Serial.begin(115200);
+  // en: starts weak-hook tasks on core0/core1
+  // ja: コア0/1の弱シンボルタスクを起動
+  ESP32AutoTask::AutoTask.begin();
+}
+
+// en: Producer (core0 normal)
+// ja: 送信側（コア0, Normal）
+void LoopCore0_Normal()
+{
+  static int counter = 0;
+  q.send(counter++); // en: blocking send / ja: ブロッキング送信
+  delay(500);        // en: throttle send rate / ja: 送信間隔を確保
+}
+
+// en: Consumer (core1 normal)
+// ja: 受信側（コア1, Normal）
+void LoopCore1_Normal()
+{
+  int value = 0;
+  if (q.receive(value, WaitForever))
+  {
+    Serial.printf("[Queue] received: %d\n", value);
+  }
+}
+
+void loop()
+{
+  delay(1);
+}

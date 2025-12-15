@@ -1,0 +1,45 @@
+#include <Arduino.h>
+#include <ESP32AutoSync.h>
+
+using namespace ESP32AutoSync;
+
+constexpr uint32_t kBitSensor = 1 << 0;
+constexpr uint32_t kBitTimeout = 1 << 1;
+
+// en: Notify bits mode between raw FreeRTOS tasks
+// ja: 生 FreeRTOS タスク間で Notify のビットモードを利用
+Notify evt(Notify::Mode::Bits);
+
+void producer(void * /*pv*/)
+{
+  for (;;)
+  {
+    evt.setBits(kBitSensor);
+    delay(300);
+    evt.setBits(kBitTimeout);
+    delay(700);
+  }
+}
+
+void consumer(void * /*pv*/)
+{
+  for (;;)
+  {
+    if (evt.waitBits(kBitSensor | kBitTimeout, WaitForever, true, false))
+    {
+      Serial.printf("[Notify/raw] bits=0x%02lx\n", (unsigned long)(kBitSensor | kBitTimeout));
+    }
+  }
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  xTaskCreatePinnedToCore(producer, "setBits", 4096, nullptr, 2, nullptr, 0);
+  xTaskCreatePinnedToCore(consumer, "waitBits", 4096, nullptr, 2, nullptr, 1);
+}
+
+void loop()
+{
+  delay(1);
+}

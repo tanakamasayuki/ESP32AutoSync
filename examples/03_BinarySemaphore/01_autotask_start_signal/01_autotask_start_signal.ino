@@ -1,0 +1,40 @@
+#include <ESP32AutoTask.h>
+#include <ESP32AutoSync.h>
+
+using namespace ESP32AutoSync;
+
+BinarySemaphore startSignal;
+
+void setup()
+{
+  Serial.begin(115200);
+  ESP32AutoTask::AutoTask.begin();
+}
+
+// en: Producer sends one-shot start signal
+// ja: 送信側が一度だけ起動合図を送る
+void LoopCore0_Normal()
+{
+  static bool sent = false;
+  if (!sent)
+  {
+    startSignal.give();
+    sent = true;
+  }
+}
+
+// en: Consumer waits for start
+// ja: 受信側が開始合図を待つ
+void LoopCore1_Normal()
+{
+  if (startSignal.take(WaitForever))
+  {
+    Serial.println("[BinarySemaphore] start!");
+    // en: run once, then idle
+    // ja: 1回動かしたら待機
+    for (;;)
+    {
+      delay(1000);
+    }
+  }
+}
