@@ -349,7 +349,7 @@ namespace ESP32AutoSync
             remaining);
         if (rc != pdPASS)
         {
-          return false; // timeout or failure
+        return false; // en: timeout or failure / ja: タイムアウトまたは失敗
         }
 
         if (!waitAll)
@@ -363,7 +363,7 @@ namespace ESP32AutoSync
           if (clearOnExit)
           {
             uint32_t dummy;
-            (void)xTaskNotifyWait(0, mask, &dummy, 0); // clear matched bits
+            (void)xTaskNotifyWait(0, mask, &dummy, 0); // en: clear matched bits / ja: 満たしたビットをクリア
           }
           return true;
         }
@@ -426,7 +426,7 @@ namespace ESP32AutoSync
           ESP_LOGW(kLogTag, "[Notify] receive failed: not bound (ISR)");
           return false;
         }
-        // auto-bind to current task
+        // en: auto-bind to current task / ja: 自タスクに自動バインド
         target_ = xTaskGetCurrentTaskHandle();
       }
       if (target_ != xTaskGetCurrentTaskHandle())
