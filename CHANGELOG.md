@@ -5,3 +5,5 @@
 - (JA) リリーススクリプト更新
 - (EN) Added changelog
 - (JA) チェンジログ追加
+- (EN) Release workflow now rebuilds the release branch and tags it so rewritten sketch.yaml files are part of the tagged release contents
+- (JA) リリースワークフローでreleaseブランチを作り直し、書き換え済みsketch.yamlをタグの内容に含めるように変更
