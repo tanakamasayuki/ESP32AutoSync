@@ -4,8 +4,8 @@
 // en: Queue between two TaskKit tasks (producer/consumer), depth=8
 // ja: TaskKit の2タスク間で使うキュー（送受信）、深さ8
 ESP32AutoSync::Queue<int> q(8);
-TaskKit::Task producer;
-TaskKit::Task consumer;
+ESP32TaskKit::Task producer;
+ESP32TaskKit::Task consumer;
 
 void setup()
 {
@@ -23,7 +23,7 @@ void setup()
         delay(500);
         return true;
       },
-      TaskKit::TaskConfig{.name = "producer", .priority = 2});
+      ESP32TaskKit::TaskConfig{.name = "producer", .priority = 2});
 
   consumer.startLoop(
       []
@@ -36,7 +36,7 @@ void setup()
         delay(1);
         return true;
       },
-      TaskKit::TaskConfig{.name = "consumer", .priority = 2});
+      ESP32TaskKit::TaskConfig{.name = "consumer", .priority = 2});
 }
 
 void loop()

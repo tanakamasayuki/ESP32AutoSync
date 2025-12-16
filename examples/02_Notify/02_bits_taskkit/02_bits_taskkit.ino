@@ -9,15 +9,16 @@ constexpr uint32_t kBitTxDone = 1 << 1;
 // en: preset to bits mode
 // ja: ビットモードで初期化
 ESP32AutoSync::Notify evt(ESP32AutoSync::Notify::Mode::Bits);
-TaskKit::Task producer;
-TaskKit::Task consumer;
+ESP32TaskKit::Task producer;
+ESP32TaskKit::Task consumer;
 
 void setup()
 {
   Serial.begin(115200);
 
   producer.startLoop(
-      [] {
+      []
+      {
         if (!evt.setBits(kBitRxReady))
         {
           Serial.println("[Notify/bits] setBits RX failed");
@@ -30,17 +31,18 @@ void setup()
         delay(800);
         return true;
       },
-      TaskKit::TaskConfig{.name = "bits-setter", .priority = 2});
+      ESP32TaskKit::TaskConfig{.name = "bits-setter", .priority = 2});
 
   consumer.startLoop(
-      [] {
+      []
+      {
         if (evt.waitBits(kBitRxReady | kBitTxDone, true, true))
         {
           Serial.println("[Notify/bits] RX ready & TX done");
         }
         return true;
       },
-      TaskKit::TaskConfig{.name = "bits-waiter", .priority = 2});
+      ESP32TaskKit::TaskConfig{.name = "bits-waiter", .priority = 2});
 }
 
 void loop()

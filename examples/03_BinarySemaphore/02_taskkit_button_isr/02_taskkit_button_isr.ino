@@ -8,7 +8,7 @@ constexpr int kButtonPin = 0;
 // en: Button ISR gives semaphore; TaskKit task takes it
 // ja: ボタン ISR が give し、TaskKit タスクが take
 ESP32AutoSync::BinarySemaphore buttonSem;
-TaskKit::Task handlerTask;
+ESP32TaskKit::Task handlerTask;
 
 void IRAM_ATTR onButton()
 {
@@ -27,14 +27,15 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(kButtonPin), onButton, FALLING);
 
   handlerTask.startLoop(
-      [] {
+      []
+      {
         if (buttonSem.take())
         {
           Serial.println("[BinarySemaphore] button pressed");
         }
         return true;
       },
-      TaskKit::TaskConfig{.name = "button", .priority = 2});
+      ESP32TaskKit::TaskConfig{.name = "button", .priority = 2});
 }
 
 void loop()
