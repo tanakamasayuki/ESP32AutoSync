@@ -171,11 +171,14 @@ q.sendToFront(value, timeoutMs);     // 先頭へ挿入（ブロック可）
 q.overwrite(value);                  // 最新で上書き（深さ1のメールボックス用途）
 q.tryReceive(out);                   // == receive(out, 0)
 q.receive(out, timeoutMs = WaitForever);
+q.count();                           // 現在の件数を取得（ISR 可）
+q.clear();                           // キューをクリア（タスクのみ）
 ```
 
 - タスク上では `timeoutMs` に `WaitForever` で無限待ち、ISR では強制ノンブロック。  
 - `send/receive` はタスク/ISR を自動判定し、`xQueueSend` / `xQueueSendFromISR` / `xQueueReceive` / `xQueueReceiveFromISR` を適切に選択。必要に応じて `portYIELD_FROM_ISR` も内部処理。  
 - `sendToFront` は先頭挿入（使用頻度は低く、FIFO 前提を崩す点に注意）。`overwrite` は最新で上書きするメールボックス用途（深さ1を想定、ブロックなし）。  
+- `count` は `uxQueueMessagesWaiting` / FromISR で現在の件数を返す。`clear` は `xQueueReset` を呼び出し、タスクコンテキストでのみ実行（ISR では拒否）。  
 - `T` はコピー/ムーブ可能な型を想定。サイズが大きい場合はポインタや小さな構造体を推奨。  
 - 戻り値は `bool`（成功/タイムアウト/キュー満杯で false）。エラー時はログを出して呼び出し側でリカバーする前提。
 - スレッド/ISR セーフ: 複数タスクからの send/receive を許容。ISR からの receive も FromISR 版で動作するが、処理本体はタスク側に寄せる運用を推奨（受信は基本タスク側）。

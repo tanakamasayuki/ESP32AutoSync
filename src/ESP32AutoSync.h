@@ -231,6 +231,37 @@ namespace ESP32AutoSync
       }
     }
 
+    uint32_t count() const
+    {
+      if (!handle_)
+      {
+        ESP_LOGE(kLogTag, "[Queue] count failed: handle null");
+        return 0;
+      }
+      return xPortInIsrContext() ? uxQueueMessagesWaitingFromISR(handle_) : uxQueueMessagesWaiting(handle_);
+    }
+
+    bool clear()
+    {
+      if (!handle_)
+      {
+        ESP_LOGE(kLogTag, "[Queue] clear failed: handle null");
+        return false;
+      }
+      if (xPortInIsrContext())
+      {
+        ESP_LOGW(kLogTag, "[Queue] clear not allowed in ISR");
+        return false;
+      }
+      BaseType_t rc = xQueueReset(handle_);
+      if (rc != pdPASS)
+      {
+        ESP_LOGW(kLogTag, "[Queue] clear failed");
+        return false;
+      }
+      return true;
+    }
+
   private:
     QueueHandle_t handle_;
   };

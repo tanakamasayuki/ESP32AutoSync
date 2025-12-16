@@ -157,11 +157,14 @@ q.sendToFront(value, timeoutMs);     // send to front (can block in tasks)
 q.overwrite(value);                  // overwrite with latest (mailbox use, depth=1)
 q.tryReceive(out);                   // == receive(out, 0)
 q.receive(out, timeoutMs = WaitForever);
+q.count();                           // current queued items (ISR-safe)
+q.clear();                           // reset queue (task only)
 ```
 
 - In tasks, `timeoutMs = WaitForever` blocks forever; in ISR it is forced non-blocking.  
 - `send/receive` auto-select `xQueueSend` / `xQueueSendFromISR` / `xQueueReceive` / `xQueueReceiveFromISR`, with `portYIELD_FROM_ISR` handled inside when needed.  
 - `sendToFront` inserts at the front (advanced; breaks strict FIFO). `overwrite` replaces with the latest value (mailbox use, depth 1 assumed; non-blocking).  
+- `count` uses `uxQueueMessagesWaiting`/FromISR to report queued items. `clear` calls `xQueueReset` (task context only; ISR is rejected).  
 - `T` should be copy/move-capable. For large payloads, pass pointers or small structs.  
 - Returns `bool` (false on timeout/full). Failures log; caller recovers.
 - Thread/ISR safety: multiple tasks may send/receive on the same instance. ISR receive works via FromISR, but keep actual processing in tasks; receiving in ISR is possible but not the primary pattern.

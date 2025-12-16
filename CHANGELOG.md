@@ -7,3 +7,5 @@
 - (JA) チェンジログ追加
 - (EN) Release workflow now rebuilds the release branch and tags it so rewritten sketch.yaml files are part of the tagged release contents
 - (JA) リリースワークフローでreleaseブランチを作り直し、書き換え済みsketch.yamlをタグの内容に含めるように変更
+- (EN) Queue<T>: added `count()` (ISR-safe) and `clear()` (task-only) helpers
+- (JA) Queue<T> に `count()`（ISR可）と `clear()`（タスク専用）を追加
