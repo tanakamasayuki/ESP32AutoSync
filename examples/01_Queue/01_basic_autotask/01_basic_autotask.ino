@@ -18,8 +18,8 @@ void setup()
 void LoopCore0_Normal()
 {
   static int counter = 0;
-  // en: send and check result
-  // ja: 送信し、結果を確認
+  // en: Blocking send with default timeout; logs on failure
+  // ja: デフォルトタイムアウトでブロッキング送信。失敗時はログ
   if (!q.send(counter++))
   {
     Serial.println("[Queue] send failed");
@@ -32,6 +32,8 @@ void LoopCore0_Normal()
 void LoopCore1_Normal()
 {
   int value = 0;
+  // en: Blocking receive; prints the received value
+  // ja: ブロッキング受信で値を取得し、表示
   if (q.receive(value))
   {
     Serial.printf("[Queue] received=%d\n", value);

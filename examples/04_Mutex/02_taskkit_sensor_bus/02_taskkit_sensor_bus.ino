@@ -14,6 +14,8 @@ void setup()
 {
   Serial.begin(115200);
 
+  // en: TaskKit sensor task (priority 2), runs every 50 ms to lock/unlock after ~250 ms hold
+  // ja: TaskKit センサタスク（優先度2）。50 ms 周期で約 250 ms 保持しロック/アンロック
   sensorTask.startLoop(
       []
       {
@@ -45,6 +47,8 @@ void setup()
       ESP32TaskKit::TaskConfig{.name = "sensor", .priority = 2},
       kMutexLoopIntervalMs);
 
+  // en: TaskKit logger task (priority 2), runs every 50 ms to lock/unlock after ~500 ms hold
+  // ja: TaskKit ロガータスク（優先度2）。50 ms 周期で約 500 ms 保持しロック/アンロック
   loggerTask.startLoop(
       []
       {

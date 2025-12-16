@@ -16,6 +16,8 @@ void setup()
 {
   Serial.begin(115200);
 
+  // en: TaskKit producer (priority 2), runs every 200 ms in a two-phase state machine
+  // ja: TaskKit 送信タスク（優先度2）。200 ms 周期の2フェーズ状態機械
   producer.startLoop(
       []
       {
@@ -55,6 +57,8 @@ void setup()
       ESP32TaskKit::TaskConfig{.name = "bits-setter", .priority = 2},
       200);
 
+  // en: TaskKit consumer (priority 2), default 1 ms tick to wait bits cooperatively
+  // ja: TaskKit 受信タスク（優先度2）。デフォルト 1 ms 周期でビット待ち
   consumer.startLoop(
       []
       {

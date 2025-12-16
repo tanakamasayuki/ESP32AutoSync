@@ -26,6 +26,8 @@ void setup()
   pinMode(kButtonPin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(kButtonPin), onButton, FALLING);
 
+  // en: TaskKit handler (priority 2), default 1 ms tick to poll semaphore
+  // ja: TaskKit ハンドラ（優先度2）。デフォルト 1 ms 周期でセマフォをポーリング
   handlerTask.startLoop(
       []
       {
