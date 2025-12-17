@@ -33,7 +33,7 @@ void setup()
       {
         if (buttonSem.take())
         {
-          Serial.println("[BinarySemaphore] button pressed");
+          Serial.printf("[BinarySemaphore] core=%d, button pressed\n", xPortGetCoreID());
         }
         return true;
       },

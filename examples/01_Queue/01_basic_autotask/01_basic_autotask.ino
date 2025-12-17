@@ -36,7 +36,7 @@ void LoopCore1_Normal()
   // ja: ブロッキング受信で値を取得し、表示
   if (q.receive(value))
   {
-    Serial.printf("[Queue] received=%d\n", value);
+    Serial.printf("[Queue] core=%d, received=%d\n", xPortGetCoreID(), value);
   }
 }
 

@@ -19,7 +19,7 @@ void waiter(void * /*pv*/)
 {
   if (sem.take())
   {
-    Serial.println("[BinarySemaphore/raw] got signal");
+    Serial.printf("[BinarySemaphore/raw] core=%d, got signal\n", xPortGetCoreID());
   }
   vTaskDelete(nullptr);
 }

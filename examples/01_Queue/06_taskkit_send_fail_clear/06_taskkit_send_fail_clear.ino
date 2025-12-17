@@ -77,9 +77,10 @@ void loop()
   int v = 0;
   while (q.tryReceive(v))
   {
-    // en: Non-blocking receive; show data and remaining count
-    // ja: ノンブロック受信でデータと残件数を表示
-    Serial.printf("[Queue/loop] got %d (remaining=%lu)\n", v, static_cast<unsigned long>(q.count()));
+    // en: Non-blocking receive; show core, data, and remaining count
+    // ja: ノンブロック受信でコア番号、データ、残件数を表示
+    Serial.printf("[Queue/loop] core=%d, got %d (remaining=%lu)\n",
+                  xPortGetCoreID(), v, static_cast<unsigned long>(q.count()));
   }
 
   delay(1); // yield

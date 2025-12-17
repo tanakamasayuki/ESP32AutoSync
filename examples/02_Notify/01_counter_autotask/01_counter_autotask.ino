@@ -31,7 +31,7 @@ void LoopCore1_Normal()
 {
   if (n.take())
   {
-    Serial.println("[Notify/counter] got event");
+    Serial.printf("[Notify/counter] core=%d, got event\n", xPortGetCoreID());
   }
 }
 

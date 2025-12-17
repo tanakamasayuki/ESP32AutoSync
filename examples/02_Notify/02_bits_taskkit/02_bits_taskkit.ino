@@ -64,7 +64,7 @@ void setup()
       {
         if (evt.waitBits(kBitRxReady | kBitTxDone, true, true))
         {
-          Serial.println("[Notify/bits] RX ready & TX done");
+          Serial.printf("[Notify/bits] core=%d, RX ready & TX done\n", xPortGetCoreID());
         }
         return true;
       },

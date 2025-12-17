@@ -30,7 +30,7 @@ void LoopCore1_Normal()
 {
   if (startSignal.take())
   {
-    Serial.println("[BinarySemaphore] start!");
+    Serial.printf("[BinarySemaphore] core=%d, start!\n", xPortGetCoreID());
     // en: run once, then idle
     // ja: 1回動かしたら待機
     for (;;)
