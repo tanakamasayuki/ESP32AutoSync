@@ -10,16 +10,20 @@ void writer(void * /*pv*/)
 {
   for (;;)
   {
-    ESP32SyncKit::Mutex::LockGuard lock(bufMutex);
-    if (lock.locked())
     {
-      sharedCounter++;
-      Serial.printf("[Mutex/raw] writer: %d\n", sharedCounter);
+      ESP32SyncKit::Mutex::LockGuard lock(bufMutex);
+      if (lock.locked())
+      {
+        sharedCounter++;
+        Serial.printf("[Mutex/raw] writer: %d\n", sharedCounter);
+      }
+      else
+      {
+        Serial.println("[Mutex/raw] writer lock failed");
+      }
     }
-    else
-    {
-      Serial.println("[Mutex/raw] writer lock failed");
-    }
+    // en: lock is released here (end of scope) before sleeping
+    // ja: スコープ終端でロックを解放してからスリープ
     delay(300);
   }
 }
@@ -28,15 +32,19 @@ void reader(void * /*pv*/)
 {
   for (;;)
   {
-    ESP32SyncKit::Mutex::LockGuard lock(bufMutex);
-    if (lock.locked())
     {
-      Serial.printf("[Mutex/raw] reader: %d\n", sharedCounter);
+      ESP32SyncKit::Mutex::LockGuard lock(bufMutex);
+      if (lock.locked())
+      {
+        Serial.printf("[Mutex/raw] reader: %d\n", sharedCounter);
+      }
+      else
+      {
+        Serial.println("[Mutex/raw] reader lock failed");
+      }
     }
-    else
-    {
-      Serial.println("[Mutex/raw] reader lock failed");
-    }
+    // en: lock is released here (end of scope) before sleeping
+    // ja: スコープ終端でロックを解放してからスリープ
     delay(500);
   }
 }

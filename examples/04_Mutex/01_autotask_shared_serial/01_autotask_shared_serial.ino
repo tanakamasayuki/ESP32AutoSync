@@ -13,15 +13,10 @@ void setup()
 
 void printSafe(const char *msg)
 {
+  // en: Protect Serial output with Mutex. Lock is held until the end of this scope
+  // ja: シリアル出力を Mutex で保護。このスコープが終わるまでロックを保持
   ESP32SyncKit::Mutex::LockGuard lock(serialMutex);
-  if (lock.locked())
-  {
-    Serial.println(msg);
-  }
-  else
-  {
-    Serial.println("[Mutex/AutoTask] lock failed");
-  }
+  Serial.println(msg);
 }
 
 void LoopCore0_Normal()

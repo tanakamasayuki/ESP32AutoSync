@@ -33,6 +33,8 @@ void setup()
             Serial.printf("[Mutex/TaskKit] sensor locked (hold %lu ms) @ %lu ms\n",
                           static_cast<unsigned long>(kSensorHoldMs),
                           static_cast<unsigned long>(startMs));
+            // en: explicit lock/unlock pattern (no RAII) to show timing
+            // ja: タイミングを示すため、RAII ではなく明示 lock/unlock
           }
           else
           {
@@ -50,6 +52,8 @@ void setup()
           Serial.printf("[Mutex/TaskKit] sensor unlocked @ %lu ms (held %lu ms)\n",
                         static_cast<unsigned long>(now),
                         static_cast<unsigned long>(now - startMs));
+          // en: explicit unlock after simulated work
+          // ja: 擬似作業後に明示的に unlock
         }
         return true;
       },
@@ -75,6 +79,8 @@ void setup()
             Serial.printf("[Mutex/TaskKit] logger locked (hold %lu ms) @ %lu ms\n",
                           static_cast<unsigned long>(kLoggerHoldMs),
                           static_cast<unsigned long>(startMs));
+            // en: explicit lock/unlock pattern (no RAII) to show timing
+            // ja: タイミングを示すため、RAII ではなく明示 lock/unlock
           }
           else
           {
@@ -92,6 +98,8 @@ void setup()
           Serial.printf("[Mutex/TaskKit] logger unlocked @ %lu ms (held %lu ms)\n",
                         static_cast<unsigned long>(now),
                         static_cast<unsigned long>(now - startMs));
+          // en: explicit unlock after simulated work
+          // ja: 擬似作業後に明示的に unlock
         }
         return true;
       },
