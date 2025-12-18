@@ -9,34 +9,25 @@ void setup()
   ESP32AutoTask::AutoTask.begin();
 }
 
-// en: Producer sends one-shot start signal
-// ja: 送信側が一度だけ起動合図を送る
+// en: Producer gives every 500 ms (if semaphore already given, give may fail)
+// ja: 送信側は 500 ms ごとに give（セマフォ保持中は give 失敗する）
 void LoopCore0_Normal()
 {
-  static bool sent = false;
-  if (!sent)
+  if (!startSignal.give())
   {
-    if (!startSignal.give())
-    {
-      Serial.println("[BinarySemaphore] give failed");
-    }
-    sent = true;
+    // en: skip if already given; Binary semaphore caps at 1
+    // ja: すでに保持されている場合はスキップ（バイナリは最大1）
   }
+  delay(500);
 }
 
-// en: Consumer waits for start
-// ja: 受信側が開始合図を待つ
+// en: Consumer waits, prints on each take, then waits again
+// ja: 受信側は take できたら出力し、再び待つ
 void LoopCore1_Normal()
 {
   if (startSignal.take())
   {
-    Serial.printf("[BinarySemaphore] core=%d, start!\n", xPortGetCoreID());
-    // en: run once, then idle
-    // ja: 1回動かしたら待機
-    for (;;)
-    {
-      delay(1000);
-    }
+    Serial.printf("[BinarySemaphore] core=%d, millis=%lu take!\n", xPortGetCoreID(), static_cast<unsigned long>(millis()));
   }
 }
 
