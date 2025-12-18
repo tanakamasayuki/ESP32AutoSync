@@ -178,6 +178,7 @@ notify.notify();                         // give. Auto Task/ISR
 notify.take(timeoutMs = WaitForever);    // consume one (bool)
 notify.tryTake();                        // == take(0)
 notify.takeAll(timeoutMs = WaitForever); // consume all, return count
+notify.tryTakeAll();                     // == takeAll(0)
 
 // Bit mode (EventGroup-like)
 notify.setBits(mask);                    // OR accumulate. ISR-safe

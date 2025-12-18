@@ -192,6 +192,7 @@ notify.notify();                         // give。ISR/Task 自動判定
 notify.take(timeoutMs = WaitForever);    // 1 件消費（bool で成否）
 notify.tryTake();                        // == take(0)
 notify.takeAll(timeoutMs = WaitForever); // まとめて取り出し、件数を返す
+notify.tryTakeAll();                     // == takeAll(0)
 
 // ビット用途（EventGroup 風）
 notify.setBits(mask);                    // OR で積み上げ。ISR 可

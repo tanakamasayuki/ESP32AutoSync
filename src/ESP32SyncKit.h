@@ -411,6 +411,10 @@ namespace ESP32SyncKit
       return ulTaskNotifyTake(pdTRUE, ticks);
     }
 
+    // en: Non-blocking takeAll()
+    // ja: ノンブロックでまとめ取り
+    uint32_t tryTakeAll() { return takeAll(0); }
+
     bool setBits(uint32_t mask)
     {
       if (!lockMode(Mode::Bits))

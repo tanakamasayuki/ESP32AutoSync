@@ -7,9 +7,7 @@ constexpr uint32_t kBitNoise = 1 << 2;   // en: unused/noisy bit (should be igno
 
 // en: Notify in bits mode (TaskKit tasks)
 // ja: Notify ビットモード（TaskKit タスクで利用）
-// en: preset to bits mode (auto-lock skipped)
-// ja: ビットモードで初期化（自動ロックの手間を省く）
-ESP32SyncKit::Notify evt(ESP32SyncKit::Notify::Mode::Bits);
+ESP32SyncKit::Notify evt;
 ESP32TaskKit::Task producer;
 ESP32TaskKit::Task consumer;
 
